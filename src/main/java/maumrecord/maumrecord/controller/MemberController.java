@@ -3,45 +3,31 @@ package maumrecord.maumrecord.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import maumrecord.maumrecord.domain.Member;
+import maumrecord.maumrecord.dto.signUpRequestDto;
 import maumrecord.maumrecord.service.MemberService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-@Controller
-@Tag(name = "회원관리 서비스 API")
+@RestController
+@RequestMapping("/members")
+@Tag(name = "회원 관련")
 public class MemberController {
     private final MemberService memberService;
     public MemberController(MemberService memberService){this.memberService=memberService;}
 
-    //테스트를 위한 home
-    @GetMapping("/")
-    @Operation(summary = "홈화면")
-    public String home(){return "home";}
-    /*
-    * 회원 등록
-    * */
-    @GetMapping(value="/members/new")
-    @Operation(summary = "회원 등록으로 이동")
-    public String createForm(){return "members/createMemberForm";}
-
-    @PostMapping(value="/members/new")
-    @Operation(summary = "회원등록 정보 post")
-    public String create(MemberForm form){
+    @PostMapping(value="/new")
+    @Operation(summary = "회원가입")
+    public ResponseEntity<String> signUp(@RequestBody signUpRequestDto request){
         Member member=new Member();
-        member.setName(form.getName());
+        member.setName(request.getName());
+        member.setEmail(request.getEmail());
+        member.setPassword(request.getPassword());
         memberService.join(member);
-        return "redirect:/";
+        return ResponseEntity.ok("회원가입 성공");
     }
+    //todo: 로그아웃, 회원정보 수정, 비밀번호 저장방식?, 로그인 방식 업데이트
 
-    @GetMapping(value = "/members")
-    @Operation(summary = "회원목록 조회")
-    public String list(Model model) {
-        List<Member> members = memberService.findMembers();
-        model.addAttribute("members", members);
-        return "members/memberList";
-    }
 }
