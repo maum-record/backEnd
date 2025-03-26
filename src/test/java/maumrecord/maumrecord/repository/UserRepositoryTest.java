@@ -1,7 +1,7 @@
 package maumrecord.maumrecord.repository;
 
 import jakarta.transaction.Transactional;
-import maumrecord.maumrecord.domain.Member;
+import maumrecord.maumrecord.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,35 +12,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-class MemberRepositoryTest {
+class UserRepositoryTest {
     @Autowired
-    MemberRepository repository;
+    UserRepository repository;
 
     @Test
     void save() {
         //given
-        Member m = new Member();
+        User m = new User();
         m.setName("test");
         //when
         repository.save(m);
         //then
-        Member result = repository.findById(m.getId()).get();
+        User result = repository.findById(m.getId()).get();
         assertThat(result).isEqualTo(m);
     }
 
     @Test
     void findByName() {
         //given
-        Member m1=new Member();
+        User m1=new User();
         m1.setName("test1");
         repository.save(m1);
 
-        Member m2=new Member();
+        User m2=new User();
         m2.setName("test2");
         repository.save(m2);
 
         //when
-        Member result=repository.findByName("test1").get();
+        User result=repository.findByName("test1").get();
 
         //then
         assertThat(result).isEqualTo(m1);
@@ -49,16 +49,16 @@ class MemberRepositoryTest {
     @Test
     void findAll() {
         //given
-        Member m1=new Member();
+        User m1=new User();
         m1.setName("test1");
         repository.save(m1);
 
-        Member m2=new Member();
+        User m2=new User();
         m2.setName("test2");
         repository.save(m2);
 
         //when
-        List<Member> result=repository.findAll();
+        List<User> result=repository.findAll();
 
         //then
         assertThat(result.size()).isEqualTo(2);

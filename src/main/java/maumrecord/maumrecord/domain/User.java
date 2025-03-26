@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Member {
+public class User {
     //ToDo: 각 컬럼 길이 제한?
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
