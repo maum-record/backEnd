@@ -17,38 +17,39 @@ import java.util.List;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements UserDetails {
-    //ToDo: 각 컬럼 길이 제한?
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id", updatable = false)
+    @Column(name ="id", updatable = false,length = 50)
     private Long id;
 
-    @Column(name="name", nullable = false)
+    @Column(name="name", nullable = false,length = 30)
     private String name;
-//     Todo:프론트에서 회원가입 수정  후 적용
-//    @Column(name="nickName", nullable = false)
-//    private String nickName;
 
-    @Column(name = "email", nullable = false,unique = true)
+    @Column(name="nickName",length = 30)
+    private String nickName;
+
+    @Column(name = "email", nullable = false,unique = true,length = 50)
     private String email;
 
     //Todo: 비밀번호 저장방식
-    @Column(name = "password",nullable = false)
+    @Column(name = "password",nullable = false,length = 50)
     private String password;
 
     @CreatedDate
     @Column(name = "createdAt",updatable = false)
     private LocalDateTime createdAt;
 
-    //Todo:닉네임추가
+    @Column(name="image")
+    private String image;
+
     @Builder
-    public User(String email, String password, String auth, String name ){
+    public User(String email, String password, String auth, String name,String nickName ){
         this.email=email;
         this.password=password;
         this.name=name;
+        this.nickName=nickName;
     }
 
-    //ToDo:createdAt 형식 지정?
     @PrePersist
     public void prePersist(){
         if(this.createdAt==null)
@@ -102,3 +103,5 @@ public class User implements UserDetails {
         return true;
     }
 }
+
+//todo: 각 힐링 요소 별 사용량이나 기록 등 이용 통계에 사용할 데이터 추가 - db확정 후 확인

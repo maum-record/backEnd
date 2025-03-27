@@ -9,7 +9,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +33,14 @@ public class UserService {
                 });
     }
 
+    public void deleteUser(Long id){
+        userRepository.deleteById(id);
+    }
+
+    public User findById(Long userId){
+        return userRepository.findById(userId)
+                .orElseThrow(()->new IllegalArgumentException("Unexpected User"));
+    }
+
     public List<User> findMembers(){return userRepository.findAll();}
-    public Optional<User> findOne(Long memberId){return userRepository.findById(memberId);}
 }

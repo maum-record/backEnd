@@ -9,6 +9,7 @@ import lombok.Setter;
 public class AddUserRequest {
     private String email;
     private String password;
-//    private String nickname;
+    private String nickname;
     private String name;
+    private String image;
 }
