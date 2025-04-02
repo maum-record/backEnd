@@ -2,12 +2,16 @@ package maumrecord.maumrecord.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import maumrecord.maumrecord.config.jwt.TokenProvider;
 import maumrecord.maumrecord.domain.User;
 import maumrecord.maumrecord.dto.AddUserRequest;
+import maumrecord.maumrecord.dto.LoginRequest;
 import maumrecord.maumrecord.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Service
@@ -16,8 +20,10 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final TokenProvider tokenProvider;
+    private final UserDetailService userDetailService;
 
-    public Long save(AddUserRequest dto){
+    public Long signUp(AddUserRequest dto){
         validateDuplicateMember(dto);
         return userRepository.save(User.builder()
                 .email(dto.getEmail())
@@ -25,16 +31,20 @@ public class UserService {
                 .build()).getId();
     }
 
-    //todo: 기본 제공 기능인지 확인
     private void validateDuplicateMember(AddUserRequest dto){
         userRepository.findByEmail(dto.getEmail())
                 .ifPresent(m->{
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
                 });
     }
-
+    //userId로 유저탈퇴(관리자전용)
     public void deleteUser(Long id){
         userRepository.deleteById(id);
+    }
+    //user의 인증정보로 탈퇴(일반유저전용)
+    public void deleteUser(Authentication authentication){
+        User user=userDetailService.loadUserByUsername(authentication.getName());
+        deleteUser(user.getId());
     }
 
     public User findById(Long userId){
@@ -43,4 +53,19 @@ public class UserService {
     }
 
     public List<User> findMembers(){return userRepository.findAll();}
+
+    public String login(LoginRequest dto) {
+        String email = dto.getEmail();
+        String password = dto.getPassword();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+
+        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호 틀림");
+        }
+
+        //todo: 토큰 발급 시 지속 시간 정하기(현재 2시간)
+        return tokenProvider.generateToken(user, Duration.ofHours(2));
+    }
 }

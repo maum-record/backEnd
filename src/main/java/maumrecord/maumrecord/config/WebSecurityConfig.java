@@ -30,21 +30,29 @@ public class WebSecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher(("/static/**")));
     }
 
-    //todo: 페이지 주소 수정
+    //todo: 현재 개발을 위해 스웨거주소 항상 열어둠
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         return http
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers(   //회원가입, 로그인 페이지는 모두 허용 - 주소 수정
-                                new AntPathRequestMatcher("/login"),
-                                new AntPathRequestMatcher("/signup")
+                                new AntPathRequestMatcher("/home"),
+                                new AntPathRequestMatcher("/home/**"),
+                                new AntPathRequestMatcher("/swagger-ui/**"),
+                                new AntPathRequestMatcher("/v3/api-docs/**")
                         ).permitAll()
+                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")  // 관리자 권한 필요
+                        .requestMatchers("/user", "/user/**").hasRole("USER")    // 일반 사용자 권한 필요
                         .anyRequest().authenticated())
                 .formLogin(formLogin->formLogin
-                        .loginPage("/login")    //login 페이지 주소
-                        .defaultSuccessUrl("/record"))   //로그인 성공 시 기본 이동 주소
+                        .loginPage("http://localhost:3000/login")    //login 페이지 주소
+                        .successHandler((request, response, authentication) -> {
+                            response.sendRedirect("http://localhost:3000/record"); // 로그인 성공 후 이동
+                        }))
                 .logout(logout->logout
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.sendRedirect("http://localhost:3000/login"); // 로그아웃 성공 후 이동
+                        })
                         .invalidateHttpSession(true))
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();

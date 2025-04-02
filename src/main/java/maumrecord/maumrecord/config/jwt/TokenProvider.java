@@ -1,6 +1,9 @@
 package maumrecord.maumrecord.config.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import maumrecord.maumrecord.domain.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -9,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -53,11 +55,6 @@ public class TokenProvider {
         Set<SimpleGrantedAuthority> authorities= Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
 
         return new UsernamePasswordAuthenticationToken(new org.springframework.security.core.userdetails.User(claims.getSubject(), "",authorities),token,authorities);
-    }
-
-    public Long getUserId(String token){
-        Claims claims = getClaims(token);
-        return claims.get("id",Long.class);
     }
 
     public Claims getClaims(String token){
