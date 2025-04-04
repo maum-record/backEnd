@@ -3,7 +3,6 @@ package maumrecord.maumrecord.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import maumrecord.maumrecord.domain.User;
-import maumrecord.maumrecord.service.UserDetailService;
 import maumrecord.maumrecord.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +21,7 @@ public class AdminController {
     @GetMapping(value = "/users")
     @Operation(summary = "회원목록 조회")
     public List<User> list() {
-        return userService.findMembers();
+        return userService.findUsers();
     }
 
     @GetMapping(value = "/users/{id}")
@@ -38,5 +37,4 @@ public class AdminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("회원탈퇴 완료");
     }
-    //todo: add 관리자 대시보드, 관리자 로그인 처리(별도 테이블 vs users에서 컬럼으로 구별),
 }

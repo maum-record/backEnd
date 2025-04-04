@@ -3,7 +3,7 @@ package maumrecord.maumrecord.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import maumrecord.maumrecord.dto.AddUserRequest;
+import maumrecord.maumrecord.dto.UserRequest;
 import maumrecord.maumrecord.dto.LoginRequest;
 import maumrecord.maumrecord.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class MainController {
     private final UserService userService;
     @PostMapping(value="/new")
     @Operation(summary = "회원가입")
-    public ResponseEntity<String> signUp(@RequestBody AddUserRequest request){
+    public ResponseEntity<String> signUp(@RequestBody UserRequest request){
         userService.signUp(request);
         return ResponseEntity.ok("회원가입 성공");
     }

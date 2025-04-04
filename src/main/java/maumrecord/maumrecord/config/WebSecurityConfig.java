@@ -30,7 +30,7 @@ public class WebSecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher(("/static/**")));
     }
 
-    //todo: 현재 개발을 위해 스웨거주소 항상 열어둠
+    //todo: 현재 개발을 위해 스웨거 주소 항상 열어둠
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         return http

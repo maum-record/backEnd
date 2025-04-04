@@ -6,7 +6,7 @@ import lombok.Setter;
 //Todo: User와 비교해서 필요 시 수정
 @Getter
 @Setter
-public class AddUserRequest {
+public class UserRequest {
     private String email;
     private String password;
     private String nickname;

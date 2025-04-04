@@ -16,15 +16,23 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final static String HEADER_AUTHORIZATION="Authorization";
-    private final static String TOKEN_PREFIX="Bearer";
+    private final static String TOKEN_PREFIX="Bearer ";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
         String authorizationHeader=request.getHeader(HEADER_AUTHORIZATION);
         String token=getAccessToken(authorizationHeader);
-        if(tokenProvider.validToken(token)){
-            Authentication authentication = tokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (tokenProvider.validToken(token)) {
+                Authentication authentication = tokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                // 토큰이 유효하지 않은 경우 401 Unauthorized 반환
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or expired token");
+                return;
+            }
         }
         filterChain.doFilter(request,response);
     }

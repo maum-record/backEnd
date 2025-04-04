@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import maumrecord.maumrecord.config.jwt.TokenProvider;
 import maumrecord.maumrecord.domain.User;
-import maumrecord.maumrecord.dto.AddUserRequest;
+import maumrecord.maumrecord.dto.UserRequest;
 import maumrecord.maumrecord.dto.LoginRequest;
 import maumrecord.maumrecord.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,20 +24,31 @@ public class UserService {
     private final TokenProvider tokenProvider;
     private final UserDetailService userDetailService;
 
-    public Long signUp(AddUserRequest dto){
-        validateDuplicateMember(dto);
-        return userRepository.save(User.builder()
-                .email(dto.getEmail())
-                .password(bCryptPasswordEncoder.encode(dto.getPassword()))
-                .build()).getId();
+    public void signUp(UserRequest request){
+        validateDuplicateMember(request);
+        userRepository.save(User.builder()
+                .email(request.getEmail())
+                .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                .build());
     }
 
-    private void validateDuplicateMember(AddUserRequest dto){
+    private void validateDuplicateMember(UserRequest dto){
         userRepository.findByEmail(dto.getEmail())
                 .ifPresent(m->{
                     throw new IllegalStateException("이미 존재하는 회원입니다.");
                 });
     }
+
+    public void updateUser(UserRequest request,String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(()->new RuntimeException("해당 유저 검색에 실패했습니다."));
+        user.setName(request.getName());
+        user.setNickName(request.getNickname());
+        user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        user.setImage(request.getImage());
+    }
+
+    //todo: 관리자 삭제 여부 설정
     //userId로 유저탈퇴(관리자전용)
     public void deleteUser(Long id){
         userRepository.deleteById(id);
@@ -52,7 +64,12 @@ public class UserService {
                 .orElseThrow(()->new IllegalArgumentException("Unexpected User"));
     }
 
-    public List<User> findMembers(){return userRepository.findAll();}
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(()->new IllegalArgumentException("Unexpected User"));
+    }
+
+    public List<User> findUsers(){return userRepository.findAll();}
 
     public String login(LoginRequest dto) {
         String email = dto.getEmail();
