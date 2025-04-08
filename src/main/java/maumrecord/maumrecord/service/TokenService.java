@@ -11,7 +11,6 @@ import java.time.Duration;
 @Service
 public class TokenService {
     private final TokenProvider tokenProvider;
-    private final RefreshTokenService refreshTokenService;
     private final UserService userService;
 
     public String createNewAccessToken(String refreshToken){
@@ -19,9 +18,13 @@ public class TokenService {
             throw new IllegalArgumentException("Unexpected token");
         }
 
-        Long userId=refreshTokenService.findByRefreshToken(refreshToken).getUserId();
-        User user=userService.findById(userId);
-        //Todo: 토큰 유효 시간 정하기(현재 2시간)
-        return tokenProvider.generateToken(user, Duration.ofHours(2));
+        String email=tokenProvider.getClaims(refreshToken).getSubject();
+        User user=userService.findByEmail(email);
+
+        if (!user.getRefreshToken().equals(refreshToken)) {
+            throw new IllegalArgumentException("Refresh Token mismatch");
+        }
+
+        return tokenProvider.generateToken(user, Duration.ofMinutes(15));
     }
 }

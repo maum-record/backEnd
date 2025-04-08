@@ -4,8 +4,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import maumrecord.maumrecord.config.jwt.TokenProvider;
 import maumrecord.maumrecord.domain.User;
-import maumrecord.maumrecord.dto.UserRequest;
 import maumrecord.maumrecord.dto.LoginRequest;
+import maumrecord.maumrecord.dto.UserRequest;
 import maumrecord.maumrecord.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +41,6 @@ public class UserService {
     public void updateUser(UserRequest request,String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()->new RuntimeException("해당 유저 검색에 실패했습니다."));
-        user.setName(request.getName());
         user.setNickName(request.getNickname());
         user.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
         user.setImage(request.getImage());
@@ -83,6 +81,19 @@ public class UserService {
         }
 
         //todo: 토큰 발급 시 지속 시간 정하기(현재 2시간)
-        return tokenProvider.generateToken(user, Duration.ofHours(2));
+        return tokenProvider.generateToken(user, Duration.ofMinutes(30));
+    }
+
+    public String findRefreshToken(String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+        return user.getRefreshToken();
+    }
+
+    public void setRefreshToken(String refreshToken,String email){
+        User user=userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
+        user.setRefreshToken(refreshToken);
+
     }
 }

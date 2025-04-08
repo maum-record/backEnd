@@ -22,9 +22,6 @@ public class User implements UserDetails {
     @Column(name ="id", updatable = false,length = 50)
     private Long id;
 
-    @Column(name="name", nullable = false,length = 30)
-    private String name;
-
     @Column(name="nickName",length = 30)
     private String nickName;
 
@@ -44,11 +41,13 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role =Role.USER;
 
+    @Column(name = "refreshToken")
+    private String refreshToken="";
+
     @Builder
-    public User(String email, String password, String auth, String name,String nickName ){
+    public User(String email, String password, String name,String nickName ){
         this.email=email;
         this.password=password;
-        this.name=name;
         this.nickName=nickName;
     }
 
