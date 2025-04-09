@@ -16,3 +16,8 @@ spring:
 jwt:
   issuer: yjj1544@gmail.com
   secret_key: jin4041
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true

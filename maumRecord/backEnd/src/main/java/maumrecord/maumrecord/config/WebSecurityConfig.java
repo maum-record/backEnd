@@ -4,15 +4,18 @@ import lombok.RequiredArgsConstructor;
 import maumrecord.maumrecord.service.UserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
@@ -32,9 +35,11 @@ public class WebSecurityConfig {
 
     //todo: 현재 개발을 위해 스웨거 주소 항상 열어둠
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http, TokenAuthenticationFilter tokenAuthenticationFilter) throws Exception{
         return http
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth->auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(   //회원가입, 로그인 페이지는 모두 허용 - 주소 수정
                                 new AntPathRequestMatcher("/home"),
                                 new AntPathRequestMatcher("/home/**"),
@@ -54,9 +59,9 @@ public class WebSecurityConfig {
                             response.sendRedirect("http://localhost:3000/login"); // 로그아웃 성공 후 이동
                         })
                         .invalidateHttpSession(true))
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
-
     }
 
     @Bean
