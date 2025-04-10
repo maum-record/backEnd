@@ -2,13 +2,11 @@ package maumrecord.maumrecord.config.jwt;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Setter
 @Getter
-@Component
-@Configuration("jwt")
+@ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
     private String issuer;
     private String secretKey;

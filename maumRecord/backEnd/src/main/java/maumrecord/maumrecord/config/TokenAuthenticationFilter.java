@@ -24,6 +24,11 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
         String authorizationHeader=request.getHeader(HEADER_AUTHORIZATION);
         String token=getAccessToken(authorizationHeader);
+        //인증이 불필요한 option 요청 예외 처리
+        if("OPTIONS".equalsIgnoreCase(request.getMethod())){
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (tokenProvider.validToken(token)) {

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Table(name = "Users")
+@Table(name = "USERS")
 @Getter
 @Setter
 @Entity
@@ -28,12 +28,12 @@ public class User implements UserDetails {
     @Column(name = "email", nullable = false,unique = true,length = 50)
     private String email;
 
-    @Column(name = "password",nullable = false,length = 50)
+    @Column(name = "password",nullable = false,length = 60) //BCryptPasswordEncoder 사용 시 password는 60자
     private String password;
 
     @CreatedDate
     @Column(name = "createdAt",updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt=LocalDateTime.now();
 
     @Column(name="image")
     private String image;
