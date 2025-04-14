@@ -28,6 +28,7 @@ public class UserService {
         userRepository.save(User.builder()
                 .email(request.getEmail())
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                .nickName(request.getNickname())
                 .build());
     }
 

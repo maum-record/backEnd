@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private String refreshToken="";
 
     @Builder
-    public User(String email, String password, String name,String nickName ){
+    public User(String email, String password, String nickName ){
         this.email=email;
         this.password=password;
         this.nickName=nickName;
@@ -58,7 +58,7 @@ public class User implements UserDetails {
     }
 
     @Column(name = "journalCount")
-    private Long number;
+    private Long count;
 
     @Column(name = "lastHealingProgram")
     private String lastHealingProgram; // e.g., '명상'
