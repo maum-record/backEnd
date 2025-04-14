@@ -16,7 +16,7 @@ spring:
 
 jwt:
   issuer: yjj1544@gmail.com
-  secretKey: amluNDA0MQ==
+  secretKey: maum-record
 
 springdoc:
   swagger-ui:

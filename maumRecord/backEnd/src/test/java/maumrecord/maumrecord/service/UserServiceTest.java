@@ -1,5 +1,6 @@
 package maumrecord.maumrecord.service;
 
+import io.jsonwebtoken.Jwts;
 import maumrecord.maumrecord.config.jwt.TokenProvider;
 import maumrecord.maumrecord.domain.User;
 import maumrecord.maumrecord.dto.LoginRequest;
@@ -72,16 +73,23 @@ class UserServiceTest {
         LoginRequest dto = new LoginRequest();
         dto.setEmail(email);
         dto.setPassword(pw);
+        String testRefreshToken = "refresh-token";
+        String testAccessToken = "access-token";
 
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(pw, "encodedPw")).thenReturn(true);
-        when(tokenProvider.generateToken(user, Duration.ofMinutes(30))).thenReturn("token");
+        when(tokenProvider.generateToken(user, Duration.ofDays(1))).thenReturn(testRefreshToken); // refreshToken
+        when(passwordEncoder.matches(pw, "encodedPw")).thenReturn(true);    //비밀번호 일치시킴
+        when(tokenProvider.validToken(testRefreshToken)).thenReturn(true);
+        when(tokenProvider.getClaims(testRefreshToken)).thenReturn(Jwts.claims().setSubject(email));  // JWT 클레임 mock
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user)); // 내부에서 다시 user 조회
+        when(tokenProvider.generateToken(user, Duration.ofMinutes(30))).thenReturn(testAccessToken); // accessToken
+
 
         // when
-        String token = userService.login(dto);
+        String resultToken = userService.login(dto);
 
         // then
-        assertEquals("token", token);
+        assertEquals(testAccessToken, resultToken);
     }
 
     //비밀번호 틀릴 시 테스트
@@ -140,16 +148,54 @@ class UserServiceTest {
         assertThrows(RuntimeException.class, () -> userService.findRefreshToken(email));
     }
 
-    //존재하지 않는 이메일로 호출 시
     @Test
-    void setRefreshToken_UserNotFound_ThrowsException() {
-        // given
-        String email = "notfound@example.com";
-        String refreshToken = "some-refresh-token";
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+    void createNewAccessToken_ValidRefreshToken_ReturnsAccessToken() {
+        //given
+        String refreshToken = "valid-refresh-token";
+        String email = "test@example.com";
+        User user = mock(User.class);
+        String expectedAccessToken = "new-access-token";
 
-        // when & then
-        assertThrows(RuntimeException.class, () -> userService.setRefreshToken(refreshToken, email));
+        when(tokenProvider.validToken(refreshToken)).thenReturn(true);
+        when(tokenProvider.getClaims(refreshToken)).thenReturn(Jwts.claims().setSubject(email));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userService.findRefreshToken(email)).thenReturn(refreshToken);
+        when(tokenProvider.generateToken(user, Duration.ofMinutes(30))).thenReturn(expectedAccessToken);
+
+        //when
+        String result = userService.createNewAccessToken(refreshToken);
+
+        //then
+        assertEquals(expectedAccessToken, result);
     }
 
+    //토큰값이 다른 경우
+    @Test
+    void createNewAccessToken_InvalidToken_ThrowsException() {
+        // Given
+        String invalidToken = "Unexpected token";
+        when(tokenProvider.validToken(invalidToken)).thenReturn(false);
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.createNewAccessToken(invalidToken));
+    }
+
+    //refresh 토큰이 일치하지 않는 경우 테스트
+    @Test
+    void createNewAccessToken_RefreshTokenMismatch_ThrowsException() {
+        // Given
+        String refreshToken = "valid-refresh-token";
+        String email = "test@example.com";
+        User user = mock(User.class);
+
+        when(tokenProvider.validToken(refreshToken)).thenReturn(true);
+        when(tokenProvider.getClaims(refreshToken)).thenReturn(Jwts.claims().setSubject(email));
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(user.getRefreshToken()).thenReturn("Refresh Token mismatch");
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class,
+                () -> userService.createNewAccessToken(refreshToken));
+    }
 }

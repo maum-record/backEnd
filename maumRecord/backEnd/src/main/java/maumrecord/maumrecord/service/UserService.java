@@ -79,9 +79,11 @@ public class UserService {
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("비밀번호 틀림");
         }
+        //로그인 시 리프레시 토큰 재발급
+        String refreshToken=tokenProvider.generateToken(user,Duration.ofDays(1));
+        user.setRefreshToken(refreshToken);
 
-        //todo: 토큰 발급 시 지속 시간 정하기(현재 2시간)
-        return tokenProvider.generateToken(user, Duration.ofMinutes(30));
+        return createNewAccessToken(refreshToken);
     }
 
     public String findRefreshToken(String email){
@@ -89,11 +91,18 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
         return user.getRefreshToken();
     }
+    public String createNewAccessToken(String refreshToken){
+        if(!tokenProvider.validToken(refreshToken)){
+            throw new IllegalArgumentException("Unexpected token");
+        }
 
-    public void setRefreshToken(String refreshToken,String email){
-        User user=userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
-        user.setRefreshToken(refreshToken);
+        String email=tokenProvider.getClaims(refreshToken).getSubject();
+        User user=findByEmail(email);
 
+        if (!user.getRefreshToken().equals(refreshToken)) {
+            throw new IllegalArgumentException("Refresh Token mismatch");
+        }
+
+        return tokenProvider.generateToken(user, Duration.ofMinutes(30));
     }
 }
