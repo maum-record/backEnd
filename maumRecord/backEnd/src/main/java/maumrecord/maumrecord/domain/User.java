@@ -105,6 +105,11 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return !this.active;
     }
+
+    public enum Role {
+        USER,
+        ADMIN
+    }
 }
 
 //todo: 각 힐링 요소 별 사용량이나 기록 등 이용 통계에 사용할 데이터 추가 - db확정 후 확인
