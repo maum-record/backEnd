@@ -23,6 +23,7 @@ public class UserService {
     private final TokenProvider tokenProvider;
     private final UserDetailService userDetailService;
 
+    //회원가입
     public void signUp(UserRequest request){
         validateDuplicateMember(request);
         userRepository.save(User.builder()
@@ -31,7 +32,7 @@ public class UserService {
                 .nickName(request.getNickname())
                 .build());
     }
-
+    //회원가입 시 중복 확인
     private void validateDuplicateMember(UserRequest dto){
         userRepository.findByEmail(dto.getEmail())
                 .ifPresent(m->{
@@ -39,6 +40,7 @@ public class UserService {
                 });
     }
 
+    //회원정보 수정 후 저장
     public void updateUser(UserRequest request,String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(()->new RuntimeException("해당 유저 검색에 실패했습니다."));
@@ -47,11 +49,11 @@ public class UserService {
         user.setImage(request.getImage());
     }
 
-    //todo: 관리자 삭제 여부 설정
     //userId로 유저탈퇴(관리자전용)
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
+
     //user의 인증정보로 탈퇴(일반유저전용)
     public void deleteUser(Authentication authentication){
         User user=userDetailService.loadUserByUsername(authentication.getName());
@@ -69,7 +71,8 @@ public class UserService {
     }
 
     public List<User> findUsers(){return userRepository.findAll();}
-
+    
+    //로그인
     public String login(LoginRequest dto) {
         String email = dto.getEmail();
         String password = dto.getPassword();
@@ -86,12 +89,13 @@ public class UserService {
 
         return createNewAccessToken(refreshToken);
     }
-
+    //email로 리프레시토큰 확인
     public String findRefreshToken(String email){
         User user=userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없음"));
         return user.getRefreshToken();
     }
+    //새 엑세스토큰 발급
     public String createNewAccessToken(String refreshToken){
         if(!tokenProvider.validToken(refreshToken)){
             throw new IllegalArgumentException("Unexpected token");

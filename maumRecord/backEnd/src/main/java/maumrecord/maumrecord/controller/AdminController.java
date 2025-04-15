@@ -6,10 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import maumrecord.maumrecord.domain.User;
 import maumrecord.maumrecord.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -42,4 +39,6 @@ public class AdminController {
         userService.deleteUser(id);
         return ResponseEntity.ok("회원탈퇴 완료");
     }
+    //todo: 관리자 답변 부분 정해지면 작성
+    //@PostMapping(value = "")
 }

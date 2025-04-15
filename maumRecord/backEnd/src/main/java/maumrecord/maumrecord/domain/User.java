@@ -2,6 +2,7 @@ package maumrecord.maumrecord.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,20 +20,19 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="id", updatable = false,length = 50)
+    @Column(updatable = false,length = 50)
     private Long id;
 
-    @Column(name="nickName",length = 30)
+    @Column(length = 30)
     private String nickName;
 
-    @Column(name = "email", nullable = false,unique = true,length = 50)
+    @Column(nullable = false,unique = true,length = 50)
     private String email;
 
-    @Column(name = "password",nullable = false,length = 60) //BCryptPasswordEncoder 사용 시 password는 60자
+    @Column(nullable = false,length = 60) //BCryptPasswordEncoder 사용 시 password는 60자
     private String password;
 
-    @CreatedDate
-    @Column(name = "createdAt",updatable = false)
+    @Column(nullable = false)
     private LocalDateTime createdAt=LocalDateTime.now();
 
     @Column(name="image")
@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role =Role.USER;
 
-    @Column(name = "refreshToken")
+    @Column()
     private String refreshToken="";
 
     @Builder

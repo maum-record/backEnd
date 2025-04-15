@@ -26,7 +26,7 @@ public class UserInquiry {
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String content;
+    private String message;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -34,6 +34,10 @@ public class UserInquiry {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private InquiryStatus status;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_id")
+    private AdminAnswer reply;
 
     public enum InquiryStatus {
         PENDING, // 답변 대기 중

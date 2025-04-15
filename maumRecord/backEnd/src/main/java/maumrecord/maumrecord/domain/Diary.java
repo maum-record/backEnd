@@ -25,7 +25,7 @@ public class Diary {
     private User user;
 
     // 요약 내용
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(name="summary", nullable = false, columnDefinition = "TEXT")
     private String summary;
 
     // 3분류 감정 결과 (POSITIVE / NEGATIVE / NEUTRAL)
@@ -44,7 +44,7 @@ public class Diary {
     @Column(name = "healing_program_id")
     private List<Long> healingProgramIds;
 
-    @CreationTimestamp
+    @Column(nullable = false)
     private LocalDateTime createdAt;
 
     public enum Sentiment {

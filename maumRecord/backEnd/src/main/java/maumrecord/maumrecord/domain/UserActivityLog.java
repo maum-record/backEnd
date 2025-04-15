@@ -28,7 +28,7 @@ public class UserActivityLog {
 
     private Long targetId;  // 관련된 대상 ID (예: 일기 ID, 프로그램 ID 등)
 
-    @Column(name = "activity_time", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime activityTime;  // 활동 시간
 
     @Column(columnDefinition = "TEXT")

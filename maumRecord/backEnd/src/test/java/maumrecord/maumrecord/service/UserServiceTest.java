@@ -147,7 +147,7 @@ class UserServiceTest {
         // when & then
         assertThrows(RuntimeException.class, () -> userService.findRefreshToken(email));
     }
-
+    //token 발급 테스트
     @Test
     void createNewAccessToken_ValidRefreshToken_ReturnsAccessToken() {
         //given
@@ -197,5 +197,36 @@ class UserServiceTest {
         // When & Then
         assertThrows(IllegalArgumentException.class,
                 () -> userService.createNewAccessToken(refreshToken));
+    }
+    //유저 업데이트 요청 시 유저 정보 반환여부 테스트
+    @Test
+    void update_Request_test(){
+        //given
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("test@example.com");
+        User user = User.builder().email("test@example.com").build();
+        when(userDetailService.loadUserByUsername("test@example.com")).thenReturn(user);
+
+        //when
+        User loadUser= userDetailService.loadUserByUsername(authentication.getName());
+
+        //then
+        assertEquals(user, loadUser);
+    }
+    //유저 업데이트 내용 저장 여부 테스트
+    @Test
+    void update_User_test(){
+        //given
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.getName()).thenReturn("test@example.com");
+        User user = User.builder().email("test@example.com").nickName("test").build();
+        when(userDetailService.loadUserByUsername("test@example.com")).thenReturn(user);
+
+        //when
+        User updateUser = userDetailService.loadUserByUsername(authentication.getName());
+        updateUser.setNickName("change");
+
+        //then
+        assertEquals(user.getNickName(), updateUser.getNickName());
     }
 }

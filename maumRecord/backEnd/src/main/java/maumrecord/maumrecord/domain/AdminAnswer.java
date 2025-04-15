@@ -2,6 +2,7 @@ package maumrecord.maumrecord.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +23,9 @@ public class AdminAnswer {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inquiry_id", nullable = false)
     private UserInquiry inquiry;
+
+    @Column(nullable = false)
+    private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;

@@ -5,7 +5,7 @@ CREATE TABLE USERS (
                        nick_name VARCHAR(30),
                        email VARCHAR(50) NOT NULL UNIQUE,
                        password VARCHAR(60) NOT NULL,
-                       created_at TIMESTAMP,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        image VARCHAR(255),
                        role VARCHAR(255),
                        refresh_token VARCHAR(255),
@@ -19,7 +19,9 @@ drop table if exists user_inquiry;
 CREATE TABLE user_inquiry (
                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
                               user_id BIGINT NOT NULL,
-                              question TEXT NOT NULL,
+                              title TEXT NOT NULL,
+                              message TEXT NOT NULL,
+                              file TEXT NOT NULL,
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                               status ENUM('OPEN', 'ANSWERED', 'CLOSED') DEFAULT 'OPEN',
                               FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -29,6 +31,7 @@ drop table if exists admin_answer;
 CREATE TABLE admin_answer (
                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
                               inquiry_id BIGINT NOT NULL,
+                              title TEXT NOT NULL,
                               answer TEXT NOT NULL,
                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                               updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -62,8 +65,8 @@ CREATE TABLE diary (
                        user_id BIGINT NOT NULL,
                        summary TEXT NOT NULL,                               -- 요약된 일기 내용
                        sentiment_score DECIMAL(5,2),                        -- 감정 분석 점수 (예: 0.0 ~ 1.0)
-                       sentiment_category_3 ENUM('긍정', '부정', '중립'),  -- 3분류 감정 (긍정, 부정, 중립)
-                       sentiment_category_7 ENUM('기쁨', '슬픔', '분노', '혐오', '두려움', '놀람', '중립'), -- 7분류 감정
+                       sentiment_category_3 ENUM( 'POSITIVE', 'NEGATIVE', 'NEUTRAL'),  -- 3분류 감정 (긍정, 부정, 중립)
+                       sentiment_category_7 ENUM( 'NEUTRAL', 'JOY', 'SADNESS', 'ANGER', 'FEAR', 'SURPRISE', 'CONTEMPT'), -- 7분류 감정
                        healing_programs TEXT,                               -- 사용한 힐링 프로그램 (프로그램 ID 목록 등, 예: '1, 2, 3')
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,      -- 일기 작성일
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
