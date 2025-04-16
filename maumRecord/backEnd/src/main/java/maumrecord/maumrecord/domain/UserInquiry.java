@@ -2,6 +2,7 @@ package maumrecord.maumrecord.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +29,7 @@ public class UserInquiry {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
+    @CreatedDate
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -35,8 +37,7 @@ public class UserInquiry {
     @Column(nullable = false)
     private InquiryStatus status;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reply_id")
+    @OneToOne(mappedBy = "inquiry", fetch = FetchType.LAZY)
     private AdminAnswer reply;
 
     public enum InquiryStatus {

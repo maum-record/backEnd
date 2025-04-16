@@ -2,8 +2,6 @@ package maumrecord.maumrecord.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,8 +11,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Table(name = "USERS")
-@Getter
-@Setter
+@Data
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User implements UserDetails {

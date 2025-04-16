@@ -2,7 +2,7 @@ package maumrecord.maumrecord.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +30,7 @@ public class AdminAnswer {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @CreatedDate
     @Column(nullable = false)
     private LocalDateTime answeredAt;
 }

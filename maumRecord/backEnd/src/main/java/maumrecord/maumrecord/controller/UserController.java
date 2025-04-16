@@ -14,11 +14,9 @@ import maumrecord.maumrecord.service.UserDetailService;
 import maumrecord.maumrecord.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.Map;
 
 @SecurityRequirement(name = "bearerAuth")
@@ -64,5 +62,11 @@ public class UserController {
     @Operation(summary = "내 문의 내역")
     public Map<UserInquiry, AdminAnswer> myInquiries(Authentication authentication){
         return inquiryService.findMyInquires(authentication);
+    }
+
+    @GetMapping(value = "/my-inquiriy/{id}")
+    @Operation(summary = "내 문의 내역")
+    public Map<UserInquiry, AdminAnswer> myInquiries(Authentication authentication, @PathVariable Long id) throws AccessDeniedException {
+        return inquiryService.findMyInquiry(authentication, id);
     }
 }

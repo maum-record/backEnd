@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface UserInquiryRepository extends JpaRepository<UserInquiry, Long> {
     List<UserInquiry> findByUser(User user);
+    List<UserInquiry> findByReplyIsNull();
 }
